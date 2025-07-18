@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Manager Pro</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍱</text></svg>">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-dark: #475569;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        h1 { font-size: 1.75rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        h4 { font-size: 1.1rem; }
+
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-gray { color: var(--gray); }
+        .text-primary { color: var(--primary); }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+
+        /* Layout */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .w-full { width: 100%; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+        .shadow-md { box-shadow: var(--card-shadow); }
+
+        /* Grid */
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        /* Header */
+        header {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            background-color: var(--primary);
+            color: white;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--gray-light);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: var(--warning-hover);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f9fafb;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background-color: #f9fafb;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card .title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--gray-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--gray-dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover td {
+            background-color: #f9fafb;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background-color: #e0e7ff;
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .tab:hover {
+            color: var(--dark);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox {
+            width: 1rem;
+            height: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox:checked::after {
+            content: "✓";
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 100;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.hide {
+            transform: translateX(120%);
+        }
+
+        .notification-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .notification-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Date picker */
+        .date-picker {
+            position: relative;
+        }
+
+        .date-picker input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: auto;
+            height: auto;
+            color: transparent;
+            background: transparent;
+        }
+
+        .date-picker input[type="date"] {
+            position: relative;
+            padding-right: 2rem;
+        }
+
+        .date-picker::after {
+            content: "📅";
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            width: 100%;
+            max-width: 28rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal .modal-content {
+            max-width: 24rem;
+        }
+
+        .confirmation-modal .modal-body {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .confirmation-modal .modal-footer {
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0.75rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .logo-icon {
+                font-size: 1.5rem;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table {
+                min-width: 640px;
+            }
+
+            .grid-cols-1-md {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                max-width: 95%;
+            }
+
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+        }
+
+        .summary-item .label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-item .value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .summary-item .subtext {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-stat-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .summary-stat-card .title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-stat-card .edit-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🍱</span>
+                <span>Meal Manager Pro</span>
+            </div>
+            <div class="flex gap-2">
+                <button id="exportBtn" class="btn btn-outline btn-sm">
+                    <span>Export Data</span>
+                </button>
+                <button id="exportJsonBtn" class="btn btn-outline btn-sm">
+                    <span>Export JSON</span>
+                </button>
+                <button id="resetAllBtn" class="btn btn-danger btn-sm">
+                    <span>Reset All</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">Dashboard</div>
+            <div class="tab" data-tab="summary">Summary</div>
+            <div class="tab" data-tab="members">Members</div>
+            <div class="tab" data-tab="records">Meal Records</div>
+            <div class="tab" data-tab="reports">Reports</div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Today's Meals</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <div class="date-picker">
+                                <input type="date" id="mealDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Meal Price (Tk)</label>
+                            <input type="number" id="mealPrice" class="form-control" placeholder="Enter meal price">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Select Members</label>
+                            <div id="membersChecklist" class="flex flex-col gap-2 max-h-64 overflow-y-auto p-2 border border-gray-100 rounded-lg">
+                                <!-- Members will be added here -->
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">👥</div>
+                                    <p>No members added yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="saveMealBtn" class="btn btn-success w-full mt-4">Save Today's Meals</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Quick Stats</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="stat-card">
+                                <div class="title">Current Price</div>
+                                <div id="currentMealPrice" class="value">Tk 0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="title">Today's Meals</div>
+                                <div id="totalMealsToday" class="value">0</div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Recent Meal Days</h3>
+                            <div id="recentMealDays" class="flex flex-wrap gap-2">
+                                <span class="text-gray-400 text-sm">No recent meals</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h2>Member Balances</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Meals</th>
+                                    <th>Total Cost</th>
+                                    <th>Amount Paid</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberBalances">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-gray-400">No members added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content">
+            <div class="summary-section">
+                <div class="summary-stat-card">
+                    <div class="title">Total Meals Served</div>
+                    <div id="grandTotalMeals" class="value">0</div>
+                    <button id="editTotalMealsBtn" class="btn btn-outline btn-sm edit-btn">Edit</button>
+                </div>
+                <div class="summary-stat-card">
+                    <div class="title">Grand Total Cost</div>
+                    <div id="grandTotalCost" class="value">৳0</div>
+                    <button id="editTotalCostBtn" class="btn btn-outline btn-sm edit-btn">Edit</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Meal Statistics</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Total Meals</th>
+                                    <th>Total Cost</th>
+                                    <th>Amount Paid</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryMemberStats">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-gray-400">No members added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Tab -->
+        <div id="members" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Manage Members</h2>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-3">Add New Member</h3>
+                            <div class="flex gap-2">
+                                <input type="text" id="newMemberName" class="form-control flex-1" placeholder="Member name">
+                                <button id="addMemberBtn" class="btn">Add</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-3">Search Members</h3>
+                            <input type="text" id="searchMember" class="form-control" placeholder="Search members...">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Meals</th>
+                                        <th>Last Active</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="membersList">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-gray-400">No members added yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Records Tab -->
+        <div id="records" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Meal Records</h2>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-group">
+                            <label class="form-label">Filter by Date</label>
+                            <div class="date-picker">
+                                <input type="date" id="filterDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Filter by Member</label>
+                            <select id="filterMember" class="form-control form-select">
+                                <option value="">All Members</option>
+                                <!-- Members will be added here -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Price</th>
+                                    <th>Members</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mealRecords">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-gray-400">No meal records found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Weekly Report</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Select Week</label>
+                            <input type="week" id="weekSelector" class="form-control">
+                        </div>
+                        <div id="weeklyReport" class="mt-4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <p>Select a week to generate report</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Monthly Report</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Select Month</label>
+                            <input type="month" id="monthSelector" class="form-control">
+                        </div>
+                        <div id="monthlyReport" class="mt-4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📈</div>
+                                <p>Select a month to generate report</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Member Modal -->
+    <div id="editMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Member</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="editMemberName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount Paid (Tk)</label>
+                    <input type="number" id="editMemberPaid" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelEditMember" class="btn btn-outline">Cancel</button>
+                <button id="saveEditMember" class="btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Meal Modal -->
+    <div id="editMealModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Meal Record</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <div class="date-picker">
+                        <input type="date" id="editMealDate" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meal Price (Tk)</label>
+                    <input type="number" id="editMealPrice" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Members Present</label>
+                    <div id="editMembersChecklist" class="flex flex-col gap-2 max-h-64 overflow-y-auto p-2 border border-gray-100 rounded-lg">
+                        <!-- Members will be added here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelEditMeal" class="btn btn-outline">Cancel</button>
+                <button id="saveEditMeal" class="btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Summary Modal -->
+    <div id="editSummaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="editSummaryModalTitle">Edit Summary</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label id="editSummaryLabel" class="form-label">Value</label>
+                    <input type="number" id="editSummaryValue" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelEditSummary" class="btn btn-outline">Cancel</button>
+                <button id="saveEditSummary" class="btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal confirmation-modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-lg font-semibold mb-4">আপনি কি নিশ্চিত?</h3>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmNo" class="btn btn-outline">No</button>
+                <button id="confirmYes" class="btn btn-danger">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        let appData = {
+            members: [],
+            mealRecords: [],
+            settings: {
+                mealPrice: 0,
+                grandTotalMeals: 0,
+                grandTotalCost: 0
+            }
+        };
+
+        // Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyj1enLxcsGgxWk-YCfrtkZP3cGIG37dk0MCpz93aibBQyocPx0qpM7D-ch4niRpcfzfg/exec';
+
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const newMemberNameInput = document.getElementById('newMemberName');
+        const addMemberBtn = document.getElementById('addMemberBtn');
+        const membersList = document.getElementById('membersList');
+        const searchMemberInput = document.getElementById('searchMember');
+        const mealDateInput = document.getElementById('mealDate');
+        const mealPriceInput = document.getElementById('mealPrice');
+        const membersChecklist = document.getElementById('membersChecklist');
+        const saveMealBtn = document.getElementById('saveMealBtn');
+        const currentMealPrice = document.getElementById('currentMealPrice');
+        const totalMealsToday = document.getElementById('totalMealsToday');
+        const recentMealDays = document.getElementById('recentMealDays');
+        const memberBalances = document.getElementById('memberBalances');
+        const filterDateInput = document.getElementById('filterDate');
+        const filterMemberSelect = document.getElementById('filterMember');
+        const mealRecords = document.getElementById('mealRecords');
+        const weekSelectorInput = document.getElementById('weekSelector');
+        const monthlyReport = document.getElementById('monthlyReport');
+        const monthSelectorInput = document.getElementById('monthSelector');
+        const weeklyReport = document.getElementById('weeklyReport');
+        const exportBtn = document.getElementById('exportBtn');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
+        const resetAllBtn = document.getElementById('resetAllBtn');
+
+        // Summary elements
+        const grandTotalMeals = document.getElementById('grandTotalMeals');
+        const grandTotalCost = document.getElementById('grandTotalCost');
+        const editTotalMealsBtn = document.getElementById('editTotalMealsBtn');
+        const editTotalCostBtn = document.getElementById('editTotalCostBtn');
+        const summaryMemberStats = document.getElementById('summaryMemberStats');
+
+        // Modal elements
+        const editMemberModal = document.getElementById('editMemberModal');
+        const editMemberNameInput = document.getElementById('editMemberName');
+        const editMemberPaidInput = document.getElementById('editMemberPaid');
+        const cancelEditMemberBtn = document.getElementById('cancelEditMember');
+        const saveEditMemberBtn = document.getElementById('saveEditMember');
+        const editMealModal = document.getElementById('editMealModal');
+        const editMealDateInput = document.getElementById('editMealDate');
+        const editMealPriceInput = document.getElementById('editMealPrice');
+        const editMembersChecklist = document.getElementById('editMembersChecklist');
+        const cancelEditMealBtn = document.getElementById('cancelEditMeal');
+        const saveEditMealBtn = document.getElementById('saveEditMeal');
+        const editSummaryModal = document.getElementById('editSummaryModal');
+        const editSummaryModalTitle = document.getElementById('editSummaryModalTitle');
+        const editSummaryLabel = document.getElementById('editSummaryLabel');
+        const editSummaryValue = document.getElementById('editSummaryValue');
+        const cancelEditSummary = document.getElementById('cancelEditSummary');
+        const saveEditSummary = document.getElementById('saveEditSummary');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmYesBtn = document.getElementById('confirmYes');
+        const confirmNoBtn = document.getElementById('confirmNo');
+
+        // Current edit references
+        let currentEditMemberId = null;
+        let currentEditMealId = null;
+        let currentEditSummaryField = null;
+        let pendingAction = null;
+        let isSyncing = false;
+
+        // Initialize the app
+        function init() {
+            loadDataFromSheet();
+            setupEventListeners();
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            mealDateInput.value = today;
+            filterDateInput.value = '';
+            
+            // Set current week and month
+            const currentWeek = getWeekNumber(new Date());
+            weekSelectorInput.value = `${today.substring(0, 4)}-W${currentWeek.week.toString().padStart(2, '0')}`;
+            monthSelectorInput.value = today.substring(0, 7);
+        }
+
+        // Load data from Google Sheet
+        async function loadDataFromSheet() {
+            try {
+                showLoading(true);
+                const response = await fetch(SCRIPT_URL);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load data from sheet');
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.members && data.mealRecords && data.settings) {
+                    appData = data;
+                    renderUI();
+                    showNotification('Data loaded successfully');
+                } else {
+                    throw new Error('Invalid data format from sheet');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Fallback to default data
+                appData = {
+                    members: [],
+                    mealRecords: [],
+                    settings: {
+                        mealPrice: 0,
+                        grandTotalMeals: 0,
+                        grandTotalCost: 0
+                    }
+                };
+                renderUI();
+                showNotification('Using default data - could not load from sheet', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Sync data to Google Sheet
+        async function syncData() {
+            if (isSyncing) return;
+            
+            try {
+                isSyncing = true;
+                showLoading(true);
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(appData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to sync data');
+                }
+                
+                const result = await response.json();
+                
+                if (result && result.success) {
+                    showNotification('Data synced successfully');
+                } else {
+                    throw new Error('Sync failed');
+                }
+            } catch (error) {
+                console.error('Error syncing data:', error);
+                showNotification('Failed to sync data', 'danger');
+            } finally {
+                isSyncing = false;
+                showLoading(false);
+            }
+        }
+
+        // Show loading state
+        function showLoading(isLoading) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (isLoading) {
+                    button.disabled = true;
+                    if (button.querySelector('.spinner') === null) {
+                        const spinner = document.createElement('span');
+                        spinner.className = 'spinner';
+                        button.insertBefore(spinner, button.firstChild);
+                    }
+                } else {
+                    button.disabled = false;
+                    const spinner = button.querySelector('.spinner');
+                    if (spinner) {
+                        button.removeChild(spinner);
+                    }
+                }
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab navigation
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => {
+                        c.classList.remove('active');
+                        c.style.display = 'none';
+                    });
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    const tabContent = document.getElementById(tabId);
+                    tabContent.style.display = 'block';
+                    setTimeout(() => {
+                        tabContent.classList.add('active');
+                    }, 10);
+                    
+                    // Generate reports when reports tab is selected
+                    if (tabId === 'reports') {
+                        generateWeeklyReport();
+                        generateMonthlyReport();
+                    }
+                    
+                    // Update summary when summary tab is selected
+                    if (tabId === 'summary') {
+                        updateSummaryStats();
+                    }
+                });
+            });
+
+            // Members
+            addMemberBtn.addEventListener('click', addMember);
+            newMemberNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addMember();
+            });
+            searchMemberInput.addEventListener('input', filterMembers);
+
+            // Meals
+            saveMealBtn.addEventListener('click', saveMeal);
+            mealPriceInput.addEventListener('change', updateMealPrice);
+
+            // Filters
+            filterDateInput.addEventListener('change', filterMealRecords);
+            filterMemberSelect.addEventListener('change', filterMealRecords);
+
+            // Reports
+            weekSelectorInput.addEventListener('change', generateWeeklyReport);
+            monthSelectorInput.addEventListener('change', generateMonthlyReport);
+
+            // Summary edit buttons
+            editTotalMealsBtn.addEventListener('click', () => openEditSummaryModal('grandTotalMeals', 'Total Meals Served'));
+            editTotalCostBtn.addEventListener('click', () => openEditSummaryModal('grandTotalCost', 'Grand Total Cost'));
+
+            // Modals
+            cancelEditMemberBtn.addEventListener('click', () => editMemberModal.classList.remove('active'));
+            saveEditMemberBtn.addEventListener('click', saveEditedMember);
+            cancelEditMealBtn.addEventListener('click', () => editMealModal.classList.remove('active'));
+            saveEditMealBtn.addEventListener('click', saveEditedMeal);
+            cancelEditSummary.addEventListener('click', () => editSummaryModal.classList.remove('active'));
+            saveEditSummary.addEventListener('click', saveEditedSummary);
+
+            // Confirmation modal
+            confirmNoBtn.addEventListener('click', () => {
+                confirmationModal.classList.remove('active');
+                pendingAction = null;
+            });
+            confirmYesBtn.addEventListener('click', executePendingAction);
+
+            // Export
+            exportBtn.addEventListener('click', exportData);
+            exportJsonBtn.addEventListener('click', exportJson);
+            
+            // Reset all
+            resetAllBtn.addEventListener('click', confirmResetAll);
+        }
+
+        // Open edit summary modal
+        function openEditSummaryModal(field, title) {
+            currentEditSummaryField = field;
+            editSummaryModalTitle.textContent = `Edit ${title}`;
+            editSummaryLabel.textContent = title;
+            editSummaryValue.value = appData.settings[field];
+            editSummaryModal.classList.add('active');
+        }
+
+        // Save edited summary value
+        function saveEditedSummary() {
+            const value = parseFloat(editSummaryValue.value);
+            
+            if (isNaN(value)) {
+                showNotification('Please enter a valid number', 'danger');
+                return;
+            }
+            
+            appData.settings[currentEditSummaryField] = value;
+            syncData();
+            editSummaryModal.classList.remove('active');
+            updateSummaryStats();
+            showNotification('Summary updated successfully');
+        }
+
+        // Show confirmation modal
+        function showConfirmation(action) {
+            pendingAction = action;
+            confirmationModal.classList.add('active');
+        }
+
+        // Execute pending action after confirmation
+        function executePendingAction() {
+            confirmationModal.classList.remove('active');
+            if (pendingAction) {
+                pendingAction();
+                pendingAction = null;
+            }
+        }
+
+        // Render the UI
+        function renderUI() {
+            renderMembers();
+            renderMembersChecklist();
+            renderMemberBalances();
+            renderMealRecords();
+            renderFilterMembers();
+            updateSummary();
+            updateSummaryStats();
+            
+            // Set current meal price
+            if (appData.settings.mealPrice) {
+                mealPriceInput.value = appData.settings.mealPrice;
+                currentMealPrice.textContent = `Tk ${appData.settings.mealPrice}`;
+            }
+        }
+
+        // Update summary stats
+        function updateSummaryStats() {
+            // Update grand totals
+            grandTotalMeals.textContent = appData.settings.grandTotalMeals;
+            grandTotalCost.textContent = `৳${appData.settings.grandTotalCost.toFixed(2)}`;
+            
+            // Update member stats table
+            summaryMemberStats.innerHTML = '';
+            
+            if (appData.members.length === 0) {
+                summaryMemberStats.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">No members added yet</td></tr>';
+                return;
+            }
+            
+            appData.members.forEach(member => {
+                const totalMeals = appData.mealRecords.reduce((total, record) => {
+                    return total + (record.members.includes(member.id) ? 1 : 0);
+                }, 0);
+                
+                const totalCost = totalMeals * appData.settings.mealPrice;
+                const balance = (member.amountPaid || 0) - totalCost;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-medium">${member.name}</td>
+                    <td>${totalMeals}</td>
+                    <td>Tk ${totalCost.toFixed(2)}</td>
+                    <td>Tk ${(member.amountPaid || 0).toFixed(2)}</td>
+                    <td class="${balance >= 0 ? 'text-success' : 'text-danger'} font-medium">
+                        Tk ${Math.abs(balance).toFixed(2)} ${balance >= 0 ? '(Credit)' : '(Due)'}
+                    </td>
+                `;
+                
+                summaryMemberStats.appendChild(tr);
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✓' : '⚠'}</span>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                notification.classList.add('hide');
+                
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Render members list
+        function renderMembers(filter = '') {
+            membersList.innerHTML = '';
+            
+            const filteredMembers = appData.members.filter(member => 
+                member.name.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            if (filteredMembers.length === 0) {
+                membersList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">No members found</td></tr>';
+                return;
+            }
+            
+            filteredMembers.forEach(member => {
+                const tr = document.createElement('tr');
+                
+                const totalMeals = appData.mealRecords.reduce((total, record) => {
+                    return total + (record.members.includes(member.id) ? 1 : 0);
+                }, 0);
+                
+                const lastActiveRecord = appData.mealRecords
+                    .filter(record => record.members.includes(member.id))
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                
+                const lastActive = lastActiveRecord ? formatDate(lastActiveRecord.date) : 'Never';
+                
+                tr.innerHTML = `
+                    <td class="font-medium">${member.name}</td>
+                    <td>${totalMeals}</td>
+                    <td class="text-sm text-gray-500">${lastActive}</td>
+                    <td class="flex gap-2">
+                        <button class="btn btn-outline btn-sm edit-member" data-id="${member.id}">Edit</button>
+                        <button class="btn btn-outline btn-sm btn-danger delete-member" data-id="${member.id}">Delete</button>
+                    </td>
+                `;
+                
+                membersList.appendChild(tr);
+            });
+            
+            // Add event listeners to edit/delete buttons
+            document.querySelectorAll('.edit-member').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const memberId = e.target.getAttribute('data-id');
+                    editMember(memberId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-member').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const memberId = e.target.getAttribute('data-id');
+                    showConfirmation(() => deleteMember(memberId));
+                });
+            });
+        }
+
+        // Render members checklist (for adding meals)
+        function renderMembersChecklist() {
+            membersChecklist.innerHTML = '';
+            
+            if (appData.members.length === 0) {
+                membersChecklist.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <p>No members added yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appData.members.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-container';
+                
+                const checkboxId = `member-${member.id}`;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.value = member.id;
+                checkbox.className = 'checkbox';
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkboxId;
+                label.textContent = member.name;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                membersChecklist.appendChild(div);
+            });
+        }
+
+        // Render members checklist for editing meal records
+        function renderEditMembersChecklist(memberIds = []) {
+            editMembersChecklist.innerHTML = '';
+            
+            if (appData.members.length === 0) {
+                editMembersChecklist.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <p>No members added yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appData.members.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-container';
+                
+                const checkboxId = `edit-member-${member.id}`;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.value = member.id;
+                checkbox.className = 'checkbox';
+                if (memberIds.includes(member.id)) {
+                    checkbox.checked = true;
+                }
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkboxId;
+                label.textContent = member.name;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                editMembersChecklist.appendChild(div);
+            });
+        }
+
+        // Render member balances
+        function renderMemberBalances() {
+            memberBalances.innerHTML = '';
+            
+            if (appData.members.length === 0) {
+                memberBalances.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">No members added yet</td></tr>';
+                return;
+            }
+            
+            appData.members.forEach(member => {
+                const totalMeals = appData.mealRecords.reduce((total, record) => {
+                    return total + (record.members.includes(member.id) ? 1 : 0);
+                }, 0);
+                
+                const totalCost = totalMeals * appData.settings.mealPrice;
+                const balance = (member.amountPaid || 0) - totalCost;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-medium">${member.name}</td>
+                    <td>${totalMeals}</td>
+                    <td>Tk ${totalCost.toFixed(2)}</td>
+                    <td>Tk ${(member.amountPaid || 0).toFixed(2)}</td>
+                    <td class="${balance >= 0 ? 'text-success' : 'text-danger'} font-medium">
+                        Tk ${Math.abs(balance).toFixed(2)} ${balance >= 0 ? '(Credit)' : '(Due)'}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline btn-sm edit-member" data-id="${member.id}">Edit</button>
+                    </td>
+                `;
+                
+                memberBalances.appendChild(tr);
+            });
+            
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-member').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const memberId = e.target.getAttribute('data-id');
+                    editMember(memberId);
+                });
+            });
+        }
+
+        // Render meal records
+        function renderMealRecords(filterDate = '', filterMember = '') {
+            mealRecords.innerHTML = '';
+            
+            let filteredRecords = [...appData.mealRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (filterDate) {
+                filteredRecords = filteredRecords.filter(record => record.date === filterDate);
+            }
+            
+            if (filterMember) {
+                filteredRecords = filteredRecords.filter(record => record.members.includes(filterMember));
+            }
+            
+            if (filteredRecords.length === 0) {
+                mealRecords.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">No meal records found</td></tr>';
+                return;
+            }
+            
+            filteredRecords.forEach(record => {
+                const tr = document.createElement('tr');
+                
+                const memberNames = record.members.map(memberId => {
+                    const member = appData.members.find(m => m.id === memberId);
+                    return member ? member.name : 'Unknown';
+                }).join(', ');
+                
+                tr.innerHTML = `
+                    <td class="font-medium">${formatDate(record.date)}</td>
+                    <td>Tk ${record.mealPrice.toFixed(2)}</td>
+                    <td class="text-sm text-gray-500">${memberNames}</td>
+                    <td>${record.members.length}</td>
+                    <td class="flex gap-2">
+                        <button class="btn btn-outline btn-sm edit-meal" data-id="${record.id}">Edit</button>
+                        <button class="btn btn-outline btn-sm btn-danger delete-meal" data-id="${record.id}">Delete</button>
+                    </td>
+                `;
+                
+                mealRecords.appendChild(tr);
+            });
+            
+            // Add event listeners to edit/delete buttons
+            document.querySelectorAll('.edit-meal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const mealId = e.target.getAttribute('data-id');
+                    editMeal(mealId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-meal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const mealId = e.target.getAttribute('data-id');
+                    showConfirmation(() => deleteMeal(mealId));
+                });
+            });
+        }
+
+        // Render members for filter dropdown
+        function renderFilterMembers() {
+            filterMemberSelect.innerHTML = '<option value="">All Members</option>';
+            
+            appData.members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                filterMemberSelect.appendChild(option);
+            });
+        }
+
+        // Update summary section
+        function updateSummary() {
+            // Update current meal price
+            if (appData.settings.mealPrice) {
+                currentMealPrice.textContent = `Tk ${appData.settings.mealPrice}`;
+            }
+            
+            // Update recent meal days
+            recentMealDays.innerHTML = '';
+            
+            const uniqueDates = [...new Set(appData.mealRecords.map(record => record.date))];
+            const sortedDates = uniqueDates.sort((a, b) => new Date(b) - new Date(a)).slice(0, 5);
+            
+            if (sortedDates.length === 0) {
+                recentMealDays.innerHTML = '<span class="text-gray-400 text-sm">No recent meals</span>';
+                return;
+            }
+            
+            sortedDates.forEach(date => {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-primary';
+                badge.textContent = formatDate(date);
+                recentMealDays.appendChild(badge);
+            });
+            
+            // Update today's meal count if today exists in records
+            const today = new Date().toISOString().split('T')[0];
+            const todayRecord = appData.mealRecords.find(record => record.date === today);
+            if (todayRecord) {
+                totalMealsToday.textContent = todayRecord.members.length;
+            } else {
+                totalMealsToday.textContent = '0';
+            }
+        }
+
+        // Add a new member
+        function addMember() {
+            const name = newMemberNameInput.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a member name', 'danger');
+                return;
+            }
+            
+            const newMember = {
+                id: Date.now().toString(),
+                name,
+                amountPaid: 0
+            };
+            
+            appData.members.push(newMember);
+            syncData();
+            
+            newMemberNameInput.value = '';
+            renderUI();
+            showNotification('Member added successfully');
+        }
+
+        // Edit a member
+        function editMember(memberId) {
+            const member = appData.members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            currentEditMemberId = memberId;
+            editMemberNameInput.value = member.name;
+            editMemberPaidInput.value = member.amountPaid || 0;
+            editMemberModal.classList.add('active');
+        }
+
+        // Save edited member
+        function saveEditedMember() {
+            const memberIndex = appData.members.findIndex(m => m.id === currentEditMemberId);
+            if (memberIndex === -1) return;
+            
+            const name = editMemberNameInput.value.trim();
+            const amountPaid = parseFloat(editMemberPaidInput.value) || 0;
+            
+            if (!name) {
+                showNotification('Please enter a member name', 'danger');
+                return;
+            }
+            
+            appData.members[memberIndex].name = name;
+            appData.members[memberIndex].amountPaid = amountPaid;
+            syncData();
+            
+            editMemberModal.classList.remove('active');
+            renderUI();
+            showNotification('Member updated successfully');
+        }
+
+        // Delete a member
+        function deleteMember(memberId) {
+            // Remove member from members list
+            appData.members = appData.members.filter(m => m.id !== memberId);
+            
+            // Remove member from all meal records
+            appData.mealRecords.forEach(record => {
+                record.members = record.members.filter(id => id !== memberId);
+            });
+            
+            syncData();
+            renderUI();
+            showNotification('Member deleted successfully');
+        }
+
+        // Filter members by name
+        function filterMembers() {
+            const filter = searchMemberInput.value.trim();
+            renderMembers(filter);
+        }
+
+        // Save meal record
+        function saveMeal() {
+            const date = mealDateInput.value;
+            const mealPrice = parseFloat(mealPriceInput.value);
+            
+            if (!date) {
+                showNotification('Please select a date', 'danger');
+                return;
+            }
+            
+            if (isNaN(mealPrice)) {
+                showNotification('Please enter a valid meal price', 'danger');
+                return;
+            }
+            
+            // Get selected members
+            const checkboxes = membersChecklist.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedMembers = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (selectedMembers.length === 0) {
+                showNotification('Please select at least one member', 'danger');
+                return;
+            }
+            
+            // Update meal price setting
+            appData.settings.mealPrice = mealPrice;
+            
+            // Check if a record already exists for this date
+            const existingRecordIndex = appData.mealRecords.findIndex(record => record.date === date);
+            
+            if (existingRecordIndex !== -1) {
+                // Update existing record
+                appData.mealRecords[existingRecordIndex] = {
+                    id: appData.mealRecords[existingRecordIndex].id,
+                    date,
+                    mealPrice,
+                    members: selectedMembers
+                };
+            } else {
+                // Add new record
+                const newRecord = {
+                    id: Date.now().toString(),
+                    date,
+                    mealPrice,
+                    members: selectedMembers
+                };
+                
+                appData.mealRecords.push(newRecord);
+                
+                // Update grand totals
+                appData.settings.grandTotalMeals += selectedMembers.length;
+                appData.settings.grandTotalCost += selectedMembers.length * mealPrice;
+            }
+            
+            syncData();
+            renderUI();
+            showNotification('Meal record saved successfully');
+        }
+
+        // Update meal price
+        function updateMealPrice() {
+            const mealPrice = parseFloat(mealPriceInput.value);
+            
+            if (!isNaN(mealPrice)) {
+                appData.settings.mealPrice = mealPrice;
+                syncData();
+                currentMealPrice.textContent = `Tk ${mealPrice}`;
+                renderMemberBalances();
+            }
+        }
+
+        // Filter meal records
+        function filterMealRecords() {
+            const date = filterDateInput.value;
+            const memberId = filterMemberSelect.value;
+            
+            renderMealRecords(date || '', memberId || '');
+        }
+
+        // Edit a meal record
+        function editMeal(mealId) {
+            const meal = appData.mealRecords.find(m => m.id === mealId);
+            if (!meal) return;
+            
+            currentEditMealId = mealId;
+            editMealDateInput.value = meal.date;
+            editMealPriceInput.value = meal.mealPrice;
+            renderEditMembersChecklist(meal.members);
+            editMealModal.classList.add('active');
+        }
+
+        // Save edited meal
+        function saveEditedMeal() {
+            const mealIndex = appData.mealRecords.findIndex(m => m.id === currentEditMealId);
+            if (mealIndex === -1) return;
+            
+            const date = editMealDateInput.value;
+            const mealPrice = parseFloat(editMealPriceInput.value);
+            
+            if (!date) {
+                showNotification('Please select a date', 'danger');
+                return;
+            }
+            
+            if (isNaN(mealPrice)) {
+                showNotification('Please enter a valid meal price', 'danger');
+                return;
+            }
+            
+            // Get selected members
+            const checkboxes = editMembersChecklist.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedMembers = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (selectedMembers.length === 0) {
+                showNotification('Please select at least one member', 'danger');
+                return;
+            }
+            
+            // Update the record
+            appData.mealRecords[mealIndex] = {
+                id: currentEditMealId,
+                date,
+                mealPrice,
+                members: selectedMembers
+            };
+            
+            // Update meal price setting if this is the most recent record
+            const mostRecentRecord = [...appData.mealRecords].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            if (mostRecentRecord.id === currentEditMealId) {
+                appData.settings.mealPrice = mealPrice;
+            }
+            
+            syncData();
+            editMealModal.classList.remove('active');
+            renderUI();
+            showNotification('Meal record updated successfully');
+        }
+
+        // Delete a meal record
+        function deleteMeal(mealId) {
+            appData.mealRecords = appData.mealRecords.filter(m => m.id !== mealId);
+            syncData();
+            renderUI();
+            showNotification('Meal record deleted successfully');
+        }
+
+        // Generate weekly report
+        function generateWeeklyReport() {
+            const weekValue = weekSelectorInput.value;
+            if (!weekValue) return;
+            
+            const [year, week] = weekValue.split('-W').map(Number);
+            const startDate = getDateOfWeek(week, year);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+            
+            const weeklyRecords = appData.mealRecords.filter(record => {
+                const recordDate = new Date(record.date);
+                return recordDate >= startDate && recordDate <= endDate;
+            });
+            
+            const totalMeals = weeklyRecords.reduce((total, record) => total + record.members.length, 0);
+            const totalCost = weeklyRecords.reduce((total, record) => total + (record.members.length * record.mealPrice), 0);
+            
+            let memberStats = {};
+            appData.members.forEach(member => {
+                memberStats[member.id] = {
+                    name: member.name,
+                    meals: 0,
+                    cost: 0,
+                    paid: member.amountPaid || 0
+                };
+            });
+            
+            weeklyRecords.forEach(record => {
+                record.members.forEach(memberId => {
+                    if (memberStats[memberId]) {
+                        memberStats[memberId].meals += 1;
+                        memberStats[memberId].cost += record.mealPrice;
+                    }
+                });
+            });
+            
+            // Calculate catering balance (total paid - total cost)
+            const totalPaid = Object.values(memberStats).reduce((sum, member) => sum + member.paid, 0);
+            const cateringBalance = totalPaid - totalCost;
+            
+            let html = `
+                <div class="summary-card">
+                    <h3>Week ${week} Summary (${formatDate(startDateStr)} to ${formatDate(endDateStr)})</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">Total Meals</div>
+                            <div class="value">${totalMeals}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Total Cost</div>
+                            <div class="value">Tk ${totalCost.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Total Paid</div>
+                            <div class="value">Tk ${totalPaid.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Catering Balance</div>
+                            <div class="value ${cateringBalance >= 0 ? 'text-success' : 'text-danger'}">Tk ${Math.abs(cateringBalance).toFixed(2)}</div>
+                            <div class="subtext">${cateringBalance >= 0 ? '(Credit)' : '(Due)'}</div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-500 mb-3">Member Summary</h3>
+            `;
+            
+            if (Object.keys(memberStats).length === 0) {
+                html += '<div class="empty-state"><div class="empty-state-icon">👥</div><p>No meal data for this week</p></div>';
+            } else {
+                html += '<div class="table-responsive"><table class="table"><thead><tr><th>Member</th><th>Meals</th><th>Cost</th><th>Paid</th><th>Balance</th></tr></thead><tbody>';
+                
+                Object.values(memberStats).forEach(member => {
+                    const balance = member.paid - member.cost;
+                    html += `
+                        <tr>
+                            <td class="font-medium">${member.name}</td>
+                            <td>${member.meals}</td>
+                            <td>Tk ${member.cost.toFixed(2)}</td>
+                            <td>Tk ${member.paid.toFixed(2)}</td>
+                            <td class="${balance >= 0 ? 'text-success' : 'text-danger'} font-medium">
+                                Tk ${Math.abs(balance).toFixed(2)} ${balance >= 0 ? '(Credit)' : '(Due)'}
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+            }
+            
+            weeklyReport.innerHTML = html;
+        }
+
+        // Generate monthly report
+        function generateMonthlyReport() {
+            const monthValue = monthSelectorInput.value;
+            if (!monthValue) return;
+            
+            const [year, month] = monthValue.split('-').map(Number);
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0);
+            
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+            
+            const monthlyRecords = appData.mealRecords.filter(record => {
+                const recordDate = new Date(record.date);
+                return recordDate >= startDate && recordDate <= endDate;
+            });
+            
+            const totalMeals = monthlyRecords.reduce((total, record) => total + record.members.length, 0);
+            const totalCost = monthlyRecords.reduce((total, record) => total + (record.members.length * record.mealPrice), 0);
+            
+            let memberStats = {};
+            appData.members.forEach(member => {
+                memberStats[member.id] = {
+                    name: member.name,
+                    meals: 0,
+                    cost: 0,
+                    paid: member.amountPaid || 0
+                };
+            });
+            
+            monthlyRecords.forEach(record => {
+                record.members.forEach(memberId => {
+                    if (memberStats[memberId]) {
+                        memberStats[memberId].meals += 1;
+                        memberStats[memberId].cost += record.mealPrice;
+                    }
+                });
+            });
+            
+            // Calculate catering balance (total paid - total cost)
+            const totalPaid = Object.values(memberStats).reduce((sum, member) => sum + member.paid, 0);
+            const cateringBalance = totalPaid - totalCost;
+            
+            let html = `
+                <div class="summary-card">
+                    <h3>${startDate.toLocaleString('default', { month: 'long', year: 'numeric' })} Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">Total Meals</div>
+                            <div class="value">${totalMeals}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Total Cost</div>
+                            <div class="value">Tk ${totalCost.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Total Paid</div>
+                            <div class="value">Tk ${totalPaid.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Catering Balance</div>
+                            <div class="value ${cateringBalance >= 0 ? 'text-success' : 'text-danger'}">Tk ${Math.abs(cateringBalance).toFixed(2)}</div>
+                            <div class="subtext">${cateringBalance >= 0 ? '(Credit)' : '(Due)'}</div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-500 mb-3">Member Summary</h3>
+            `;
+            
+            if (Object.keys(memberStats).length === 0) {
+                html += '<div class="empty-state"><div class="empty-state-icon">👥</div><p>No meal data for this month</p></div>';
+            } else {
+                html += '<div class="table-responsive"><table class="table"><thead><tr><th>Member</th><th>Meals</th><th>Cost</th><th>Paid</th><th>Balance</th></tr></thead><tbody>';
+                
+                Object.values(memberStats).forEach(member => {
+                    const balance = member.paid - member.cost;
+                    html += `
+                        <tr>
+                            <td class="font-medium">${member.name}</td>
+                            <td>${member.meals}</td>
+                            <td>Tk ${member.cost.toFixed(2)}</td>
+                            <td>Tk ${member.paid.toFixed(2)}</td>
+                            <td class="${balance >= 0 ? 'text-success' : 'text-danger'} font-medium">
+                                Tk ${Math.abs(balance).toFixed(2)} ${balance >= 0 ? '(Credit)' : '(Due)'}
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+            }
+            
+            monthlyReport.innerHTML = html;
+        }
+
+        // Export data to CSV
+        function exportData() {
+            // Prepare members data
+            let csv = 'Member Name,Total Meals,Total Cost,Amount Paid,Balance\n';
+            
+            appData.members.forEach(member => {
+                const totalMeals = appData.mealRecords.reduce((total, record) => {
+                    return total + (record.members.includes(member.id) ? 1 : 0);
+                }, 0);
+                
+                const totalCost = totalMeals * appData.settings.mealPrice;
+                const balance = (member.amountPaid || 0) - totalCost;
+                
+                csv += `"${member.name}",${totalMeals},${totalCost.toFixed(2)},${(member.amountPaid || 0).toFixed(2)},${balance.toFixed(2)}\n`;
+            });
+            
+            // Prepare meal records data
+            csv += '\n\nDate,Meal Price,Members Present,Total Meals\n';
+            
+            appData.mealRecords.forEach(record => {
+                const memberNames = record.members.map(memberId => {
+                    const member = appData.members.find(m => m.id === memberId);
+                    return member ? member.name : 'Unknown';
+                }).join(', ');
+                
+                csv += `"${formatDate(record.date)}",${record.mealPrice.toFixed(2)},"${memberNames}",${record.members.length}\n`;
+            });
+            
+            // Add summary data
+            csv += '\n\nGrand Total Meals,Grand Total Cost\n';
+            csv += `${appData.settings.grandTotalMeals},${appData.settings.grandTotalCost.toFixed(2)}\n`;
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `meal-manager-export-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Data exported successfully');
+        }
+
+        // Export data as JSON
+        function exportJson() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `meal-manager-data-${new Date().toISOString().split('T')[0]}.json`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('JSON exported successfully');
+        }
+
+        // Confirm reset all data
+        function confirmResetAll() {
+            showConfirmation(() => {
+                appData = {
+                    members: [],
+                    mealRecords: [],
+                    settings: {
+                        mealPrice: 0,
+                        grandTotalMeals: 0,
+                        grandTotalCost: 0
+                    }
+                };
+                syncData();
+                renderUI();
+                showNotification('All data has been reset');
+            });
+        }
+
+        // Helper function to format date
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Helper function to get week number
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return { year: d.getUTCFullYear(), week: weekNo };
+        }
+
+        // Helper function to get date from week number
+        function getDateOfWeek(week, year) {
+            const simple = new Date(year, 0, 1 + (week - 1) * 7);
+            const dow = simple.getDay();
+            const ISOweekStart = simple;
+            if (dow <= 4)
+                ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+            else
+                ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+            return ISOweekStart;
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

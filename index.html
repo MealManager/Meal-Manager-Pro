@@ -208,6 +208,14 @@
             background-color: var(--warning-hover);
         }
 
+        .btn-info {
+            background-color: var(--info);
+        }
+
+        .btn-info:hover {
+            background-color: #2563eb;
+        }
+
         /* Cards */
         .card {
             background-color: var(--card-bg);
@@ -718,21 +726,6 @@
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
         }
-
-        /* Loading spinner */
-        .spinner {
-            display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -743,11 +736,11 @@
                 <span>Meal Manager Pro</span>
             </div>
             <div class="flex gap-2">
+                <button id="messageBtn" class="btn btn-info btn-sm">
+                    <span>Message</span>
+                </button>
                 <button id="exportBtn" class="btn btn-outline btn-sm">
                     <span>Export Data</span>
-                </button>
-                <button id="exportJsonBtn" class="btn btn-outline btn-sm">
-                    <span>Export JSON</span>
                 </button>
                 <button id="resetAllBtn" class="btn btn-danger btn-sm">
                     <span>Reset All</span>
@@ -1121,8 +1114,6 @@
             }
         };
 
-        // Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuasOjWhaktk2gdwxbvlA6EMgzSCtM6oR_5c6JGOn1r2FRys98Q0oftRAcVVe-Rwl7Pw/exec';
         // DOM Elements
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -1145,8 +1136,8 @@
         const monthlyReport = document.getElementById('monthlyReport');
         const monthSelectorInput = document.getElementById('monthSelector');
         const weeklyReport = document.getElementById('weeklyReport');
+        const messageBtn = document.getElementById('messageBtn');
         const exportBtn = document.getElementById('exportBtn');
-        const exportJsonBtn = document.getElementById('exportJsonBtn');
         const resetAllBtn = document.getElementById('resetAllBtn');
 
         // Summary elements
@@ -1183,12 +1174,12 @@
         let currentEditMealId = null;
         let currentEditSummaryField = null;
         let pendingAction = null;
-        let isSyncing = false;
 
         // Initialize the app
         function init() {
-            loadDataFromSheet();
+            loadData();
             setupEventListeners();
+            renderUI();
             
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
@@ -1201,99 +1192,35 @@
             monthSelectorInput.value = today.substring(0, 7);
         }
 
-        // Load data from Google Sheet
-        async function loadDataFromSheet() {
-            try {
-                showLoading(true);
-                const response = await fetch(SCRIPT_URL);
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('mealManagerData');
+            if (savedData) {
+                appData = JSON.parse(savedData);
                 
-                if (!response.ok) {
-                    throw new Error('Failed to load data from sheet');
+                // Initialize summary fields if they don't exist
+                if (appData.settings.grandTotalMeals === undefined) {
+                    appData.settings.grandTotalMeals = calculateTotalMeals();
                 }
-                
-                const data = await response.json();
-                
-                if (data && data.members && data.mealRecords && data.settings) {
-                    appData = data;
-                    renderUI();
-                    showNotification('Data loaded successfully');
-                } else {
-                    throw new Error('Invalid data format from sheet');
+                if (appData.settings.grandTotalCost === undefined) {
+                    appData.settings.grandTotalCost = calculateTotalCost();
                 }
-            } catch (error) {
-                console.error('Error loading data:', error);
-                // Fallback to default data
-                appData = {
-                    members: [],
-                    mealRecords: [],
-                    settings: {
-                        mealPrice: 0,
-                        grandTotalMeals: 0,
-                        grandTotalCost: 0
-                    }
-                };
-                renderUI();
-                showNotification('Using default data - could not load from sheet', 'danger');
-            } finally {
-                showLoading(false);
             }
         }
 
-        // Sync data to Google Sheet
-        async function syncData() {
-            if (isSyncing) return;
-            
-            try {
-                isSyncing = true;
-                showLoading(true);
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(appData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to sync data');
-                }
-                
-                const result = await response.json();
-                
-                if (result && result.success) {
-                    showNotification('Data synced successfully');
-                } else {
-                    throw new Error('Sync failed');
-                }
-            } catch (error) {
-                console.error('Error syncing data:', error);
-                showNotification('Failed to sync data', 'danger');
-            } finally {
-                isSyncing = false;
-                showLoading(false);
-            }
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('mealManagerData', JSON.stringify(appData));
         }
 
-        // Show loading state
-        function showLoading(isLoading) {
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                if (isLoading) {
-                    button.disabled = true;
-                    if (button.querySelector('.spinner') === null) {
-                        const spinner = document.createElement('span');
-                        spinner.className = 'spinner';
-                        button.insertBefore(spinner, button.firstChild);
-                    }
-                } else {
-                    button.disabled = false;
-                    const spinner = button.querySelector('.spinner');
-                    if (spinner) {
-                        button.removeChild(spinner);
-                    }
-                }
-            });
+        // Calculate total meals from records
+        function calculateTotalMeals() {
+            return appData.mealRecords.reduce((total, record) => total + record.members.length, 0);
+        }
+
+        // Calculate total cost from records
+        function calculateTotalCost() {
+            return appData.mealRecords.reduce((total, record) => total + (record.members.length * record.mealPrice), 0);
         }
 
         // Setup event listeners
@@ -1347,6 +1274,11 @@
             weekSelectorInput.addEventListener('change', generateWeeklyReport);
             monthSelectorInput.addEventListener('change', generateMonthlyReport);
 
+            // Message button
+            messageBtn.addEventListener('click', () => {
+                window.open('https://secure-vault.github.io/Meal-member/', '_blank', 'width=600,height=600');
+            });
+
             // Summary edit buttons
             editTotalMealsBtn.addEventListener('click', () => openEditSummaryModal('grandTotalMeals', 'Total Meals Served'));
             editTotalCostBtn.addEventListener('click', () => openEditSummaryModal('grandTotalCost', 'Grand Total Cost'));
@@ -1368,7 +1300,6 @@
 
             // Export
             exportBtn.addEventListener('click', exportData);
-            exportJsonBtn.addEventListener('click', exportJson);
             
             // Reset all
             resetAllBtn.addEventListener('click', confirmResetAll);
@@ -1393,7 +1324,7 @@
             }
             
             appData.settings[currentEditSummaryField] = value;
-            syncData();
+            saveData();
             editSummaryModal.classList.remove('active');
             updateSummaryStats();
             showNotification('Summary updated successfully');
@@ -1787,7 +1718,7 @@
             };
             
             appData.members.push(newMember);
-            syncData();
+            saveData();
             
             newMemberNameInput.value = '';
             renderUI();
@@ -1820,7 +1751,7 @@
             
             appData.members[memberIndex].name = name;
             appData.members[memberIndex].amountPaid = amountPaid;
-            syncData();
+            saveData();
             
             editMemberModal.classList.remove('active');
             renderUI();
@@ -1837,7 +1768,7 @@
                 record.members = record.members.filter(id => id !== memberId);
             });
             
-            syncData();
+            saveData();
             renderUI();
             showNotification('Member deleted successfully');
         }
@@ -1902,7 +1833,7 @@
                 appData.settings.grandTotalCost += selectedMembers.length * mealPrice;
             }
             
-            syncData();
+            saveData();
             renderUI();
             showNotification('Meal record saved successfully');
         }
@@ -1913,7 +1844,7 @@
             
             if (!isNaN(mealPrice)) {
                 appData.settings.mealPrice = mealPrice;
-                syncData();
+                saveData();
                 currentMealPrice.textContent = `Tk ${mealPrice}`;
                 renderMemberBalances();
             }
@@ -1966,6 +1897,9 @@
                 return;
             }
             
+            // Get the original record for comparison
+            const originalRecord = appData.mealRecords[mealIndex];
+            
             // Update the record
             appData.mealRecords[mealIndex] = {
                 id: currentEditMealId,
@@ -1980,7 +1914,7 @@
                 appData.settings.mealPrice = mealPrice;
             }
             
-            syncData();
+            saveData();
             editMealModal.classList.remove('active');
             renderUI();
             showNotification('Meal record updated successfully');
@@ -1988,8 +1922,15 @@
 
         // Delete a meal record
         function deleteMeal(mealId) {
+            const mealIndex = appData.mealRecords.findIndex(m => m.id === mealId);
+            if (mealIndex === -1) return;
+            
+            const meal = appData.mealRecords[mealIndex];
+            
+            // Remove the record
             appData.mealRecords = appData.mealRecords.filter(m => m.id !== mealId);
-            syncData();
+            
+            saveData();
             renderUI();
             showNotification('Meal record deleted successfully');
         }
@@ -2231,25 +2172,10 @@
             showNotification('Data exported successfully');
         }
 
-        // Export data as JSON
-        function exportJson() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `meal-manager-data-${new Date().toISOString().split('T')[0]}.json`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification('JSON exported successfully');
-        }
-
         // Confirm reset all data
         function confirmResetAll() {
             showConfirmation(() => {
+                localStorage.removeItem('mealManagerData');
                 appData = {
                     members: [],
                     mealRecords: [],
@@ -2259,7 +2185,6 @@
                         grandTotalCost: 0
                     }
                 };
-                syncData();
                 renderUI();
                 showNotification('All data has been reset');
             });
